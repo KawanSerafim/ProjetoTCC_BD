@@ -3,23 +3,27 @@ package model.entidades;
 public class Pessoa {
 
 	private int id;
-	private String senha;
 	private String nome;
 	private String email;
+	private String senha;
 	
 	public Pessoa() {}
 	
-	public Pessoa(int id, String senha, String nome, String email) {
+	public Pessoa(int id,  String nome, String email, String senha) {
 		
 		this.id = id;
-		this.senha = senha;
 		this.nome = nome;
 		this.email = email;
+		this.senha = senha;
 		
 	}
 
 	public int getId() {
 		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getSenha() {

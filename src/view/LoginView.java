@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 public class LoginView extends Application {
 	// Campos de Texto
-	private TextField txtEmail = new TextField();
+	private TextField txtMatricula = new TextField();
 	private TextField txtSenha = new TextField();
 	
 	//controller
@@ -35,27 +35,33 @@ public class LoginView extends Application {
 		linhaConstraints.setPercentHeight(15.0);
 		
 		paneForm.getRowConstraints().addAll(linhaConstraints,
-				linhaConstraints);
+				linhaConstraints, linhaConstraints);
 		
 		//labels
-		paneForm.add(new Label("Email:"), 0, 0);
-		paneForm.add(new Label("Senha:"), 0, 1);
+		Label lbMatricula =new Label("Matricula/RA:");
+
+		Label lbSenha = new Label("Senha:");
+
+		paneForm.add(lbMatricula, 0, 0);
+		paneForm.add(lbSenha, 0, 1);
 	
 		//Campos de texto
-		paneForm.add(txtEmail, 1, 0);
+		paneForm.add(txtMatricula, 1, 0);		
 		paneForm.add(txtSenha, 1, 1);
 		
 		//Botões
 		Button btnLogin = new Button("Logar");
+		btnLogin.setStyle("-fx-padding: 15px;");
 		paneForm.add(btnLogin, 0, 2);
 		Button btnCadastrar = new Button("Cadastrar");
+		btnCadastrar.setStyle("-fx-padding: 15px;");
 		paneForm.add(btnCadastrar, 1, 2);
 		
-	paneForm.setStyle("-fx-padding: 10px;");
+		paneForm.setStyle("-fx-padding: 10px;-fx-background-color: #f1faee;");
 		panePrincipal.setCenter(paneForm);
 		
 		//Cena e Stage
-		Scene sc = new Scene(panePrincipal, 600, 300);
+		Scene sc = new Scene(panePrincipal, 800, 600);
 		stage.setTitle("Login");
 		stage.setScene(sc);
 		stage.show();
