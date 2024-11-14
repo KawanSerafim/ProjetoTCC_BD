@@ -17,7 +17,7 @@ public class LoginView extends Application {
 	private TextField txtSenha = new TextField();
 	
 	//controller
-	
+	//A fazer: controller do login com conecção no banco de dados
 	@Override
 	public void start(Stage stage) throws Exception {
 		//Paineis
@@ -53,8 +53,12 @@ public class LoginView extends Application {
 		Button btnLogin = new Button("Logar");
 		btnLogin.setStyle("-fx-padding: 15px;");
 		paneForm.add(btnLogin, 0, 2);
+		
 		Button btnCadastrar = new Button("Cadastrar");
 		btnCadastrar.setStyle("-fx-padding: 15px;");
+		btnCadastrar.setOnAction(e -> {
+			// Fazer modal para redirecionar para cadastor de aluno ou professor
+		});
 		paneForm.add(btnCadastrar, 1, 2);
 		
 		paneForm.setStyle("-fx-padding: 10px;-fx-background-color: #f1faee;");

@@ -4,6 +4,7 @@
 <div style="display: inline_block">
     <img align="center" alt="html5" src="https://img.shields.io/badge/Microsoft_SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" />
   <img align="center" alt="html5" src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
+ <img align="center" alt="html5" width="100" src="https://matthiasseys.com/assets/img/logos/logo-javafx.png?h=c01f036c48430d3658975355d04a9ad6" />
 </div><br/>
 
 ## **Feito por 👤**

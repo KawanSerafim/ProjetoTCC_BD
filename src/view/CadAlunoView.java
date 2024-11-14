@@ -6,7 +6,11 @@ import java.util.List;
 import controller.CadAlunoController;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -90,10 +94,14 @@ public class CadAlunoView extends Application {
 		Button btnCad = new Button("Cadastrar");
 		btnCad.setStyle("-fx-padding: 14px;");
 		
-		vincularPropriedes();
-		
 		btnCad.setOnAction(e -> {
+			vincularPropriedes();
 			control.cadastrar();
+			Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Cadastro de Aluno");
+            alert.setHeaderText("Informativo");
+            alert.setContentText("Aluno foi cadastrado com sucesso");
+            alert.show();
 		});
 		
 		paneForm.add(btnCad, 1, 7);
@@ -119,9 +127,9 @@ public class CadAlunoView extends Application {
         Bindings.bindBidirectional(txtEmail.textProperty(), control.getEmail());
         Bindings.bindBidirectional(txtSenha.textProperty(), control.getSenha());
         // A fazer: ComboBox retorna string ou int e preciso de StringProperty ou IntegerProperty
-        //Bindings.bindBidirectional(cbCurso.getValue() , control.getCurso());
-		//Bindings.bindBidirectional(cbTurno.getValue() , control.getTurno());
-		 //Bindings.bindBidirectional(cbSemestre.getValue() , control.getSemestre());
+        Bindings.bindBidirectional( new SimpleStringProperty(cbCurso.getValue()) , control.getCurso());
+		Bindings.bindBidirectional( new SimpleStringProperty(cbTurno.getValue()) , control.getTurno());
+		Bindings.bindBidirectional( new SimpleIntegerProperty(cbSemestre.getValue()) , control.getSemestre());
     }
 	public static void main(String[] args) {
 		launch(CadAlunoView.class,args);
