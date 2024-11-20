@@ -6,6 +6,13 @@ public class Orientador extends Pessoa {
 	
 	public Orientador() {}
 	
+	public Orientador(int id, String nome, String email, String senha, String matricula) {
+		
+		super(id, nome, email, senha);
+		this.matricula = matricula;
+		
+	}
+	
 	public Orientador(String matricula) {
 		
 		this.matricula = matricula;
