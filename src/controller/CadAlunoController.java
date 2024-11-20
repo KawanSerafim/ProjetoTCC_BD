@@ -64,11 +64,5 @@ public class CadAlunoController {
 	public IntegerProperty getSemestre() {
 		return semestre;
 	}
-	
-	
-
-	
-    
-
-	
+		
 }
