@@ -6,13 +6,13 @@ public class Aluno extends Pessoa {
 	private String grupoId;
 	private String curso;
 	private String turno;
-	private char semestre;
+	private int semestre;
 	
 	public Aluno() {}
 	
 	//Construtor com as informações da classe pessoa + classe aluno
 	public Aluno(int id, String nome, String email, String senha, 
-			               String ra, String curso, String turno, char semestre) {
+			               String ra, String curso, String turno, int semestre) {
 			
 		//envia informações para construtor da classe pessoa
 		super(id,nome,email,senha);
@@ -48,11 +48,11 @@ public class Aluno extends Pessoa {
 		this.turno = turno;
 	}
 
-	public char getSemestre() {
+	public int getSemestre() {
 		return semestre;
 	}
 
-	public void setSemestre(char semestre) {
+	public void setSemestre(int semestre) {
 		this.semestre = semestre;
 	}
 	
@@ -63,5 +63,6 @@ public class Aluno extends Pessoa {
 	public void setGrupoId(String grupoId) {
 		this.grupoId = grupoId;
 	}
+
 	
 }

@@ -9,6 +9,7 @@ import model.entidades.Aluno;
 public class CadAlunoController {
 	//Pessoa
 	private int contadorId = 0;
+	private IntegerProperty id = new SimpleIntegerProperty(0);
 	private StringProperty senha = new SimpleStringProperty();
 	private StringProperty nome = new SimpleStringProperty();
 	private StringProperty email = new SimpleStringProperty();
@@ -29,12 +30,13 @@ public class CadAlunoController {
 		a.setRa(this.ra.get());
 		a.setCurso(this.curso.get());
 		a.setTurno(this.turno.get());
-		a.setSemestre((char) this.semestre.get());
-		System.out.println("Novo aluno cadastrado");		
+		a.setSemestre( this.semestre.get());
+		System.out.println("Novo aluno cadastrado");
+		
 	}
 
-	public int getContadorId() {
-		return contadorId;
+	public IntegerProperty getId() {
+		return id;
 	}
 
 	public StringProperty getSenha() {
