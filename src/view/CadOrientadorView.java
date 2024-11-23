@@ -1,9 +1,7 @@
 package view;
 
 import controller.CadOrientadorController;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -12,10 +10,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
-import javafx.stage.Stage;
+import view.interfaces.Tela;
 
-public class CadOrientadorView extends Application {
+public class CadOrientadorView implements Tela {
 	//Campos de Texto
 	private TextField txtNome = new TextField();
 	private TextField txtMatricula = new TextField();
@@ -26,7 +25,7 @@ public class CadOrientadorView extends Application {
 	private CadOrientadorController control = new CadOrientadorController();
 	
 	@Override
-	public void start(Stage stage) throws Exception {
+	public Pane render() {
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
@@ -80,10 +79,10 @@ public class CadOrientadorView extends Application {
 		
 		//Scene e Stage
 		panePrincipal.setCenter(paneForm);
-		Scene sc = new Scene(panePrincipal, 800,600);
-		stage.setTitle("Cadastro Orientador");
-		stage.setScene(sc);
-		stage.show();
+		
+		return panePrincipal;
+		
+		
 	}
 	
     public void vincularPropriedes() { 
@@ -92,8 +91,4 @@ public class CadOrientadorView extends Application {
         Bindings.bindBidirectional(txtEmail.textProperty(), control.getEmail());
         Bindings.bindBidirectional(txtSenha.textProperty(), control.getSenha());
     }
-	public static void main(String[] args) {
-		launch(CadOrientadorView.class,args);
-	}
-
 }

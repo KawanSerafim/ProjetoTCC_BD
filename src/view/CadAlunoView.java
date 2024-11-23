@@ -18,10 +18,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
+import view.interfaces.Tela;
 
-public class CadAlunoView extends Application {
+public class CadAlunoView implements Tela {
 	//Campos de Texto
 	private TextField txtNome = new TextField();
 	private TextField txtRa = new TextField();
@@ -43,7 +45,7 @@ public class CadAlunoView extends Application {
 	private CadAlunoController control = new CadAlunoController();
 	
 	@Override
-	public void start(Stage stage) throws Exception {
+	public Pane render() {
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
@@ -117,10 +119,8 @@ public class CadAlunoView extends Application {
 		
 		//Scene e Stage
 		panePrincipal.setCenter(paneForm);
-		Scene sc = new Scene(panePrincipal, 800,600);
-		stage.setTitle("Cadastro Aluno");
-		stage.setScene(sc);
-		stage.show();
+		
+		return panePrincipal;
 	}
 	
 	private void preencheLista() {
@@ -148,8 +148,5 @@ public class CadAlunoView extends Application {
     	
 
     }
-	public static void main(String[] args) {
-		launch(CadAlunoView.class,args);
-	}
 
 }

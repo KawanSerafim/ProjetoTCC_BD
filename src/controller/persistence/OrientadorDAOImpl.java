@@ -5,36 +5,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import controller.persistence.exceptions.OrientadorException;
+import controller.persistence.exceptions.SistemaException;
 import model.dao.OrientadorDAO;
 import model.entidades.Orientador;
+import model.persistence.Conexao;
 
 public class OrientadorDAOImpl implements OrientadorDAO {
 	
-	private Connection con = null;
-	private static String HOST_NAME = "localhost"; //IP da maquina do servidor
-	private static String DB_NAME = "clinica";// nome da database
-	private static String USER = "sa";// nome do usario sqlserver
-	private static String SENHA = "123456"; // senha do usuario
-	
-	public OrientadorDAOImpl() throws OrientadorException {
-		try {
-			Class.forName("net.sourceforge.jtds.jdbc.Driver"); // Referencia da lib de conexão
-			//Configuração da String da conexão com SQLServer
-			con = DriverManager.getConnection(
-					String.format(
-							"jdbc:jtds:sqlserver://%s:1433;databaseName=%s;user=%s;password=%s",
-							HOST_NAME,DB_NAME, USER, SENHA));
-			
-		}catch(ClassNotFoundException | SQLException err) {
-			err.printStackTrace();
-			throw new OrientadorException(err);
-		}
-	}
-	
 	
 	@Override
-	public void inserir(Orientador orientador) throws OrientadorException {
+	public void inserir(Orientador orientador) throws SistemaException {
 		try {
 			//Primeiro insere a entidade mae, Pessoa
 			inserirPessoa(orientador);
@@ -42,24 +22,28 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 			          INSERT INTO orientador (pessoaId, matricula)
 			          VALUES (?, ?)
 			          """;
+				 //Busca a instancia da conexao e instancia um java.sql.Connection
+				  Connection con = Conexao.getInstancia().getConection();
 			      PreparedStatement stm = con.prepareStatement(SQL);
 			      stm.setInt(1, 0);
 			      stm.setString(2, orientador.getMatricula());
 			      int i = stm.executeUpdate();
 			      System.out.println(i);
+			      con.close(); 
 			    } catch (SQLException er) {
 			      er.printStackTrace();
-			      throw new OrientadorException(er);
+			      throw new SistemaException(er);
 			    }
 		
 	}
 
-	private void inserirPessoa(Orientador orientador) throws OrientadorException{
+	private void inserirPessoa(Orientador orientador) throws SistemaException{
 		try {
 			String SQL = """
 			          INSERT INTO pessoa (id, senha, nome, email)
 			          VALUES (?, ?, ?)
 			          """;
+			      Connection con = Conexao.getInstancia().getConection();
 			      PreparedStatement stm = con.prepareStatement(SQL);
 			      stm.setInt(1, 0);
 			      stm.setString(2, orientador.getSenha());
@@ -67,16 +51,17 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 			      stm.setString(4, orientador.getEmail());
 			      int i = stm.executeUpdate();
 			      System.out.println(i);
+			      con.close();
 			    } catch (SQLException er) {
 			      er.printStackTrace();
-			      throw new OrientadorException(er);
+			      throw new SistemaException(er);
 			    }
 		
 	}
 
 
 	@Override
-	public void atualizar(Orientador orientador) throws OrientadorException {
+	public void atualizar(Orientador orientador) throws SistemaException {
 		try {
 			 //Atualiza os dados da entidade mae
 			  atualizarPessoa(orientador);
@@ -85,25 +70,28 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 		          UPDATE orientador SET matricula=?
 		          WHERE id=?
 		          """;
+		      Connection con = Conexao.getInstancia().getConection();
 		      PreparedStatement stm = con.prepareStatement(SQL);
 		      stm.setString(1, orientador.getMatricula());
 		      stm.setInt(2, orientador.getId());
 		      int i = stm.executeUpdate();
 		      System.out.println(i);
+		      con.close();
 		    } catch (SQLException er) {
 		      er.printStackTrace();
-		      throw new OrientadorException(er);
+		      throw new SistemaException(er);
 		    }
 		
 	}
 
 
-	private void atualizarPessoa(Orientador orientador) throws OrientadorException {
+	private void atualizarPessoa(Orientador orientador) throws SistemaException {
 		try {
 		      String SQL = """
 		          UPDATE pessoa SET senha=?, nome=?, email=?
 		          WHERE id=?
 		          """;
+		      Connection con = Conexao.getInstancia().getConection();
 		      PreparedStatement stm = con.prepareStatement(SQL);
 		      stm.setString(1, orientador.getSenha());
 		      stm.setString(2, orientador.getNome());
@@ -111,9 +99,10 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 		      stm.setInt(4, orientador.getId());
 		      int i = stm.executeUpdate();
 		      System.out.println(i);
+		      con.close();
 		    } catch (SQLException er) {
 		      er.printStackTrace();
-		      throw new OrientadorException(er);
+		      throw new SistemaException(er);
 		    }
 		
 	}

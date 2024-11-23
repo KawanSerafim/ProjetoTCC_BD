@@ -8,10 +8,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
+import view.interfaces.Tela;
 
-public class LoginView extends Application {
+public class LoginView implements Tela {
 	// Campos de Texto
 	private TextField txtMatricula = new TextField();
 	private TextField txtSenha = new TextField();
@@ -19,7 +21,7 @@ public class LoginView extends Application {
 	//controller
 	//A fazer: controller do login com conecção no banco de dados
 	@Override
-	public void start(Stage stage) throws Exception {
+	public Pane render()  {
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
@@ -64,16 +66,6 @@ public class LoginView extends Application {
 		paneForm.setStyle("-fx-padding: 10px;-fx-background-color: #f1faee;");
 		panePrincipal.setCenter(paneForm);
 		
-		//Cena e Stage
-		Scene sc = new Scene(panePrincipal, 800, 600);
-		stage.setTitle("Login");
-		stage.setScene(sc);
-		stage.show();
+		return panePrincipal;
 	}
-
-	public static void main(String[] args) {
-		launch(LoginView.class,args);
-
-	}
-
 }
