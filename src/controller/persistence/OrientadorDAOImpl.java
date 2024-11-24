@@ -16,20 +16,46 @@ import model.persistence.Conexao;
 public class OrientadorDAOImpl implements OrientadorDAO {
 	
 	
+	
+	public int buscaId(String tabela) throws SistemaException{
+		//metodo para buscar o ultimo id adicionado e retornar o valor do proximo
+		int idAtual = 0;
+		try {
+			String SQL = """
+			        SELECT IDENT_CURRENT( ? ) as id
+			          """;
+				 //Busca a instancia da conexao e instancia um java.sql.Connection
+				  Connection con = Conexao.getInstancia().getConnection();
+			      PreparedStatement stm = con.prepareStatement(SQL);
+			      stm.setString(1,"'"+tabela +"'");
+			      ResultSet rs = stm.executeQuery();
+			      while(rs.next()) {
+			    	  idAtual = rs.getInt("id");
+			      }
+			      con.close(); 
+		    } catch (SQLException er) {
+		      er.printStackTrace();
+		      throw new SistemaException(er);
+		    }
+			return idAtual;
+	}
+	
 	@Override
 	public void inserir(Orientador orientador) throws SistemaException {
 		if(verificaPessoaOrientadorExiste(orientador) == false) {
 			try {
 				//Primeiro insere a entidade mae, Pessoa
 				inserirPessoa(orientador);
+				//Pega o id de pessoa que acaba de ser adicionado
+				orientador.setId(buscaId("Pessoa"));
 				String SQL = """
-				          INSERT INTO orientador (pessoaId, matricula)
+				          INSERT INTO Orientador (pessoaId, matricula)
 				          VALUES (?, ?)
 				          """;
 					 //Busca a instancia da conexao e instancia um java.sql.Connection
 					  Connection con = Conexao.getInstancia().getConnection();
 				      PreparedStatement stm = con.prepareStatement(SQL);
-				      stm.setInt(1, 0);
+				      stm.setInt(1, orientador.getId());
 				      stm.setString(2, orientador.getMatricula());
 				      int i = stm.executeUpdate();
 				      System.out.println(i);
@@ -82,28 +108,51 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 
 	private void inserirPessoa(Orientador orientador) throws SistemaException{
 			try {
-				//verifica se ja existe pessoa com o mesmo email
+				//busca o ultimo id adicionado
+				int novoId = buscaId("Orientador");
+				novoId+= 1;
+				orientador.setId(novoId);
 				
 				String SQL = """
-				          INSERT INTO pessoa (id, senha, nome, email)
+				          INSERT INTO Pessoa (senha, nome, email)
 				          VALUES (?, ?, ?)
 				          """;
 				      Connection con = Conexao.getInstancia().getConnection();
 				      PreparedStatement stm = con.prepareStatement(SQL);
-				      stm.setInt(1, 0);
-				      stm.setString(2, orientador.getSenha());
-				      stm.setString(3, orientador.getNome());
-				      stm.setString(4, orientador.getEmail());
+				      stm.setString(1, orientador.getSenha());
+				      stm.setString(2, orientador.getNome());
+				      stm.setString(3, orientador.getEmail());
 				      int i = stm.executeUpdate();
 				      System.out.println(i);
 				      con.close();
 		    } catch (SQLException er) {
 		      er.printStackTrace();
+		      int id = buscaId("Orientador");
+		      voltaId("Pessoa", id);
 		      throw new SistemaException(er);
 		    }
 		
 	}
 
+	private void voltaId(String tabela, int id) throws SistemaException {
+		//Caso ocorreu erro na hora da inserção, volta o numero do id para a proxima inserção
+		try {
+					
+			String SQL = """
+			          DBCC CHECKIDENT(?, RESEED, ?)
+			          """;
+			      Connection con = Conexao.getInstancia().getConnection();
+			      PreparedStatement stm = con.prepareStatement(SQL);
+			      stm.setString(1, " ' "+ tabela + " ' ");
+			      stm.setInt(2, id);
+			      ResultSet rs = stm.executeQuery();
+			      System.out.println(rs.toString());
+			      con.close();
+	    } catch (SQLException er) {
+	      er.printStackTrace();
+	      throw new SistemaException(er);
+	    }
+	}
 
 	@Override
 	public void atualizar(Orientador orientador) throws SistemaException {
@@ -112,8 +161,8 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 			  atualizarPessoa(orientador);
 			  //Atualiza os dados de orientador
 		      String SQL = """
-		          UPDATE orientador SET matricula=?
-		          WHERE id=?
+		          UPDATE Orientador SET matricula=?
+		          WHERE pessoaId=?
 		          """;
 		      Connection con = Conexao.getInstancia().getConnection();
 		      PreparedStatement stm = con.prepareStatement(SQL);
@@ -133,7 +182,7 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 	private void atualizarPessoa(Orientador orientador) throws SistemaException {
 		try {
 		      String SQL = """
-		          UPDATE pessoa SET senha=?, nome=?, email=?
+		          UPDATE Pessoa SET senha=?, nome=?, email=?
 		          WHERE id=?
 		          """;
 		      Connection con = Conexao.getInstancia().getConnection();
@@ -161,8 +210,8 @@ public class OrientadorDAOImpl implements OrientadorDAO {
 			//Select condiconal e com junção de tabelas
 			String SQL = """
 				SELECT p.id, p.nome, p.email, p.senha,
-				o.matricula FROM pessoa p
-				INNER JOIN orientador o
+				o.matricula FROM Pessoa p
+				INNER JOIN Orientador o
 				ON p.id = o.pessoaId
 				WHERE p.email = ?
 				""";

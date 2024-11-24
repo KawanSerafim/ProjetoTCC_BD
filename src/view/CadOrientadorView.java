@@ -55,7 +55,7 @@ public class CadOrientadorView implements Tela {
 		//Labels
 		Label lbNome =new Label("Nome:");
 		paneForm.add(lbNome, 0, 0);
-		Label lbMatricula =new Label("RA:");
+		Label lbMatricula =new Label("Matricula:");
 		paneForm.add(lbMatricula, 0, 1);
 		Label lbEmail =new Label("Email");
 		paneForm.add(lbEmail, 0, 2);

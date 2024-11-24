@@ -4,15 +4,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import controller.persistence.exceptions.SistemaException;
 import model.dao.AlunoDAO;
 import model.dao.PessoaDAO;
 import model.entidades.Aluno;
+import model.entidades.Orientador;
 import model.entidades.Pessoa;
 import model.persistence.Conexao;
 
-public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
+public class AlunoDAOImpl implements AlunoDAO {
 
 	@Override
 	public void inserir(Aluno a) throws SistemaException {
@@ -20,19 +24,18 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 			//Primeiro insere a entidade mae, Pessoa
 			inserirPessoa(a);
 			String SQL = """
-			          INSERT INTO aluno (pessoaId, grupoId, ra, turno, semestre, curso)
-			          VALUES (?, ?, ?, ?,?, ?)
+			          INSERT INTO Aluno (pessoaId, grupoId, ra, turno, semestre, curso)
+			          VALUES (?, ?, ?, ?, ?, ?)
 			          """;
 				 //Busca a instancia da conexao e instancia um java.sql.Connection
 				  Connection con = Conexao.getInstancia().getConnection();
 			      PreparedStatement stm = con.prepareStatement(SQL);
-			      stm.setInt(1, 0);
-			      stm.setString(2, "null");
+			      stm.setInt(1, a.getId());
+			      stm.setNull(2, Types.VARCHAR);
 			      stm.setString(3, a.getRa());
 			      stm.setString(4, a.getTurno());
-			      stm.setString(5, String.valueOf(a.getSemestre()));
+			      stm.setInt(5, a.getSemestre());
 			      stm.setString(6, a.getCurso());
-			      
 			      int i = stm.executeUpdate();
 			      System.out.println(i);
 			      con.close(); 
@@ -44,55 +47,78 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 	}
 
 	private void inserirPessoa(Aluno a) throws SistemaException {
-		if (buscaIdPessoaPorEmail(a.getEmail()) == null) {
+		//busca o id mais recente e acrescenta +1
+			int idNovo = buscaId("Pessoa");
+			idNovo+= 1;
+			a.setId(idNovo);
 			try {
 				//Verifica se ja existe pessoa com esse email
 				String SQL = """
-				          INSERT INTO pessoa (id, senha, nome, email)
+				          INSERT INTO Pessoa (senha, nome, email)
 				          VALUES (?, ?, ?)
 				          """;
 				      Connection con = Conexao.getInstancia().getConnection();
 				      PreparedStatement stm = con.prepareStatement(SQL);
-				      stm.setInt(1, 0);
-				      stm.setString(2, a.getSenha());
-				      stm.setString(3, a.getNome());
-				      stm.setString(4, a.getEmail());
+				      stm.setString(1, a.getSenha());
+				      stm.setString(2, a.getNome());
+				      stm.setString(3, a.getEmail());
 				      int i = stm.executeUpdate();
 				      System.out.println(i);
 				      con.close();
 		    } catch (SQLException er) {
+		      int id = buscaId("Pessoa");
+		      voltaId("Pessoa", id);
 		      er.printStackTrace();
 		      throw new SistemaException(er);
 		    }
-		} else {
-			SQLException er = new SQLException();
-			throw new SistemaException(er);
-		}
 		
 	}
 	
-	@Override
-	public Integer buscaIdPessoaPorEmail(String email) throws SistemaException {
-		Integer id = null;
+	public int buscaId(String tabela) throws SistemaException{
+		//metodo para buscar o ultimo id adicionado e retornar o valor do proximo
+		int idAtual = 0;
 		try {
-			//Select condicIonal
 			String SQL = """
-				SELECT id FROM pessoa 
-				WHERE email = ?
-				""";
-			Connection con = Conexao.getInstancia().getConnection();
-			PreparedStatement stm = con.prepareStatement(SQL);
-			stm.setString(1, email);
-			ResultSet rs = stm.executeQuery();
-			while(rs.next()) {
-				id = rs.getInt("id");
-			}
-		} catch (SQLException e) {
-			throw new SistemaException(e);
-		}
-		return id;
+			        SELECT IDENT_CURRENT( ? ) as id
+			          """;
+				 //Busca a instancia da conexao e instancia um java.sql.Connection
+				  Connection con = Conexao.getInstancia().getConnection();
+			      PreparedStatement stm = con.prepareStatement(SQL);
+			      stm.setString(1,"'"+tabela +"'");
+			      ResultSet rs = stm.executeQuery();
+			      while(rs.next()) {
+			    	  idAtual = rs.getInt("id");
+			      }
+			      con.close(); 
+		    } catch (SQLException er) {
+		      er.printStackTrace();
+		      throw new SistemaException(er);
+		    }
+			return idAtual;
 	}
 	
+	
+	private void voltaId(String tabela, int id) throws SistemaException {
+		//Caso ocorreu erro na hora da inserção, volta o numero do id para a proxima inserção
+		try {
+					
+			String SQL = """
+			          DBCC CHECKIDENT(?, RESEED, ?)
+			          """;
+			      Connection con = Conexao.getInstancia().getConnection();
+			      PreparedStatement stm = con.prepareStatement(SQL);
+			      stm.setString(1, " ' "+ tabela + " ' ");
+			      stm.setInt(2, id);
+			      ResultSet rs = stm.executeQuery();
+			      System.out.println(rs.toString());
+			      con.close();
+	    } catch (SQLException er) {
+	      er.printStackTrace();
+	      throw new SistemaException(er);
+	    }
+	}
+
+		
 
 	@Override
 	public void atualizar(Aluno a) throws SistemaException {
@@ -101,7 +127,8 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 			  atualizarPessoa(a);
 			  //Atualiza os dados de orientador
 		      String SQL = """
-		          UPDATE aluno SET ra=?, turno=?, semestre=?, curso=?
+		          UPDATE Aluno SET ra=?, turno=?, 
+		          semestre=?, curso=?, grupoId=?
 		          WHERE pessoaId=?
 		          """;
 		      Connection con = Conexao.getInstancia().getConnection();
@@ -110,6 +137,7 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 		      stm.setString(2, a.getTurno());
 		      stm.setString(3, String.valueOf(a.getSemestre()) );
 		      stm.setString(4, a.getCurso());
+		      stm.setInt(5, a.getGrupoId());
 		      stm.setInt(5, a.getId());
 		      
 		      int i = stm.executeUpdate();
@@ -125,7 +153,7 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 	private void atualizarPessoa(Aluno a) throws SistemaException {
 		try {
 		      String SQL = """
-		          UPDATE pessoa SET senha=?, nome=?, email=?
+		          UPDATE Pessoa SET senha=?, nome=?, email=?
 		          WHERE id=?
 		          """;
 		      Connection con = Conexao.getInstancia().getConnection();
@@ -149,7 +177,7 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 		//remove primeiro entidade filha
 		try {
 			String SQL = """
-				DELETE FROM aluno WHERE pessoaId=?
+				DELETE FROM Aluno WHERE pessoaId=?
 				""";
 			Connection con = Conexao.getInstancia().getConnection();
 			PreparedStatement stm = con.prepareStatement(SQL);
@@ -161,7 +189,6 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 			er.printStackTrace();
 			throw new SistemaException(er);
 		}
-		
 
 	}
 
@@ -169,7 +196,7 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 		//remove primeiro entidade filha
 				try {
 					String SQL = """
-						DELETE FROM pessoa WHERE id=?
+						DELETE FROM Pessoa WHERE id=?
 						""";
 					Connection con = Conexao.getInstancia().getConnection();
 					PreparedStatement stm = con.prepareStatement(SQL);
@@ -181,37 +208,52 @@ public class AlunoDAOImpl implements AlunoDAO, PessoaDAO {
 					er.printStackTrace();
 					throw new SistemaException(er);
 				}
+				//Garante que o identity não vai quebrar
+				int id = buscaId("Pessoa");
+				voltaId("Pessoa", id);
 	}
 
+
 	@Override
-	public boolean verificaLoginESenha(String email, String senha) throws SistemaException {
+	public boolean verificaPessoaAlunoExiste(Aluno a) throws SistemaException {
+		//Select condiconal e com junção de tabelas
+		//Verifica se existe um orientador igual ao objeto recebido como parametro
+		List<Aluno> lista = new ArrayList<>();
 		try {
-			//Select condicIonal para verificar login
 			String SQL = """
-				SELECT email, senha FROM pessoa p
-				WHERE email=? AND senha=?
+				SELECT p.id, p.nome, p.senha, p.email,
+				a.ra, a.curso, a.semestre, a.turno,
+				a.grupoId,  FROM Pessoa p
+				INNER JOIN Aluno a
+				ON p.id = a.pessoaId
+				WHERE a.pessoaId=?
 				""";
 			Connection con = Conexao.getInstancia().getConnection();
 			PreparedStatement stm = con.prepareStatement(SQL);
-			stm.setString(1, email);
-			stm.setString(2,senha);
+			stm.setInt(1, a.getId());
 			ResultSet rs = stm.executeQuery();
 			while(rs.next()) {
-				if(rs.getString("email").equals(email)) {
-					if(rs.getString("senha").equals(senha)) {
-						return true;
-					}
-				}
+				Aluno aluno = new Aluno();
+				a.setId(rs.getInt("id"));
+				a.setNome(rs.getString("nome"));
+				a.setEmail(rs.getString("email"));
+				a.setSenha(rs.getString("senha"));
+				a.setRa(rs.getString("ra"));
+				a.setCurso(rs.getString("curso"));
+				a.setTurno(rs.getString("turno"));
+				a.setSemestre(rs.getInt("semestre"));
+				a.setGrupoId(rs.getInt("grupoId"));
+				lista.add(aluno);
 			}
 		} catch (SQLException e) {
 			throw new SistemaException(e);
 		}
-		return false;
-	}
-
-	@Override
-	public boolean verificaPessoaAlunoExiste(Aluno a) throws SistemaException {
-		// TODO Auto-generated method stub
+		//compara valores
+		for(Aluno item : lista ) {
+			if(item.equals(a)) {
+				return true;
+			}
+		}
 		return false;
 	}
 

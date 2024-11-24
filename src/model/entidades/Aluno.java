@@ -3,7 +3,7 @@ package model.entidades;
 public class Aluno extends Pessoa {
 	
 	private String ra;
-	private String grupoId;
+	private int grupoId;
 	private String curso;
 	private String turno;
 	private int semestre;
@@ -56,11 +56,11 @@ public class Aluno extends Pessoa {
 		this.semestre = semestre;
 	}
 	
-	public String getGrupoId() {
+	public int getGrupoId() {
 		return grupoId;
 	}
 
-	public void setGrupoId(String grupoId) {
+	public void setGrupoId(int grupoId) {
 		this.grupoId = grupoId;
 	}
 

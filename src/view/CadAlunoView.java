@@ -26,7 +26,7 @@ import model.entidades.Aluno;
 import view.interfaces.Tela;
 import view.interfaces.TelaLogadoAluno;
 
-public class CadAlunoView implements TelaLogadoAluno{
+public class CadAlunoView implements Tela{
 	
 	//Campos de Texto
 	private TextField txtNome = new TextField();
@@ -44,21 +44,6 @@ public class CadAlunoView implements TelaLogadoAluno{
 	ComboBox<String> cbTurno = new ComboBox<>();
 
 	ComboBox<Integer> cbSemestre = new ComboBox<>();
-	
-	private Aluno user;
-
-	
-	@Override
-	public void setUser(Aluno user) {
-		this.user = user;
-		
-	}
-
-	@Override
-	public Aluno getUser() {
-		return this.user;
-	}
-	
 	
 	
 	//control

@@ -9,7 +9,7 @@ import controller.persistence.exceptions.SistemaException;
 public class Conexao {
 	
 	private static String HOST_NAME = "localhost"; //IP da maquina do servidor
-	private static String DB_NAME = "clinica";// nome da database
+	private static String DB_NAME = "projeto_tcc";// nome da database
 	private static String USER = "sa";// nome do usario sqlserver
 	private static String SENHA = "123456"; // senha do usuario
 	private static String DB_URL = String.format(
@@ -38,9 +38,8 @@ public class Conexao {
 	
 	public Connection getConnection() throws SistemaException {
 		try {
-			if (this.connection == null ||
-					this.connection.isClosed() ||
-					!this.getConnection().isValid(5000)) {
+			if (this.connection == null || 
+	                this.connection.isClosed()) {
 				//Configuração da String da conexão com SQLServer
 						this.connection = DriverManager.getConnection(DB_URL);
 			}

@@ -1,5 +1,10 @@
 package view;
 
+import controller.LoginController;
+import controller.persistence.exceptions.SistemaException;
+import javafx.beans.binding.Bindings;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -12,13 +17,21 @@ import view.interfaces.Tela;
 
 public class LoginView implements Tela {
 	// Campos de Texto
-	private TextField txtMatricula = new TextField();
+	private TextField txtEmail = new TextField();
 	private TextField txtSenha = new TextField();
 	
 	//controller
-	//A fazer: controller do login com conecção no banco de dados
+	private LoginController control;
+	
 	@Override
 	public Pane render()  {
+		
+		try {
+			control = new LoginController();
+		} catch (SistemaException e) {
+			alert(AlertType.ERROR, "Ao ao inicializar o sistema");
+		}
+		
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
@@ -37,7 +50,7 @@ public class LoginView implements Tela {
 				linhaConstraints, linhaConstraints);
 		
 		//labels
-		Label lbMatricula =new Label("Matricula/RA:");
+		Label lbMatricula =new Label("Email:");
 
 		Label lbSenha = new Label("Senha:");
 
@@ -45,24 +58,54 @@ public class LoginView implements Tela {
 		paneForm.add(lbSenha, 0, 1);
 	
 		//Campos de texto
-		paneForm.add(txtMatricula, 1, 0);		
+		paneForm.add(txtEmail, 1, 0);		
 		paneForm.add(txtSenha, 1, 1);
 		
-		//Botões
-		Button btnLogin = new Button("Logar");
-		btnLogin.setStyle("-fx-padding: 15px;");
-		paneForm.add(btnLogin, 0, 2);
+		vincularPropriedades();
 		
-		Button btnCadastrar = new Button("Cadastrar");
-		btnCadastrar.setStyle("-fx-padding: 15px;");
-		btnCadastrar.setOnAction(e -> {
-			// Fazer modal para redirecionar para cadastor de aluno ou professor
+		//Botões
+		Button btnLoginO = new Button("Logar como Orientador");
+		btnLoginO.setStyle("-fx-padding: 15px;");
+		paneForm.add(btnLoginO, 0, 2);
+		btnLoginO.setOnAction(e -> {
+			try {
+				if(control.verificaLogin()) {
+					control.loginOrientador(new MenuOrientador());
+				}
+			} catch (SistemaException err) {
+				alert(AlertType.ERROR, "Erro ao logar");
+				err.printStackTrace();
+			}
 		});
-		paneForm.add(btnCadastrar, 1, 2);
+		//Btn Aluno
+		Button btnLoginA = new Button("Logar como Aluno");
+		btnLoginA.setStyle("-fx-padding: 15px;");
+		paneForm.add(btnLoginA, 1, 2);
+		btnLoginA.setOnAction(e -> {
+			try {
+				if(control.verificaLogin()) {
+					control.loginAluno(new MenuAluno());
+				}
+			} catch (SistemaException err) {
+				alert(AlertType.ERROR, "Erro ao logar");
+				err.printStackTrace();
+			}
+		});
 		
 		paneForm.setStyle("-fx-padding: 10px;-fx-background-color: #f1faee;");
 		panePrincipal.setCenter(paneForm);
 		
 		return panePrincipal;
 	}
+	
+	  public void alert(AlertType tipo, String msg) { 
+	        Alert alertWindow = new Alert(tipo);
+	        alertWindow.setHeaderText("Alerta");
+	        alertWindow.setContentText(msg);
+	        alertWindow.showAndWait();
+	    }
+	  public void vincularPropriedades() { 
+	        Bindings.bindBidirectional(txtEmail.textProperty(), control.emailProperty());
+	        Bindings.bindBidirectional(txtSenha.textProperty(), control.senhaProperty());
+	  }
 }

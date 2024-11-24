@@ -19,8 +19,9 @@ import view.interfaces.Tela;
 public class PrincipalView extends Application {
 	private Map<String, Tela> telas = new HashMap<>();
 	
-	//contol
-	private MenuController control = new MenuController();
+	public Map<String, Tela> getTelas() {
+		return telas;
+	}
 	
 	 @Override
 	    public void start(Stage stage) { 
@@ -47,7 +48,6 @@ public class PrincipalView extends Application {
 
 	        panePrincipal.setTop( menuBar );
 	        
-	        vincularPropriedes();
 
 	        mnuCadOrientador.setOnAction( e -> panePrincipal.setCenter( telas.get("cadastroOrientador").render() ) ); 
 	        mnuCadAluno.setOnAction( e -> panePrincipal.setCenter( telas.get("cadastroAluno").render() ) ); 
@@ -59,16 +59,7 @@ public class PrincipalView extends Application {
 	        stage.show();
 	    }
 	 
-	 public void vincularPropriedes() { 
-		 //Cria um MapProperty e preenche ele com as telas
-		   MapProperty<String, Tela> lista = new SimpleMapProperty<>();
-		   for (Map.Entry<String, Tela> tela : telas.entrySet()) {
-			String key = tela.getKey();
-			Tela val = tela.getValue();
-			lista.put(key, val);
-		}
-	        Bindings.bindBidirectional(lista, control.telasProperty());
-	    }
+	
 	 
 	 public static void main(String[] args) {
 		 launch(PrincipalView.class,args);

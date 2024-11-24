@@ -1,6 +1,8 @@
 package view;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import controller.CadAreaController;
 import controller.persistence.exceptions.SistemaException;
@@ -20,9 +22,11 @@ import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import model.entidades.AreaOrientador;
 import model.entidades.Orientador;
+import view.interfaces.Tela;
 import view.interfaces.TelaLogadoOrientador;
 
 public class CadAreaView implements TelaLogadoOrientador {
+	private Map<String, Tela> telasOrientador = new HashMap<>();
 	private Label lbId = new Label("");
 	//ComboBox
 	private ComboBox<String> cbArea = new ComboBox<>();
@@ -46,12 +50,24 @@ public class CadAreaView implements TelaLogadoOrientador {
 	}
 	
 	@Override
+	public Map<String, Tela> getTelasOrientador() {
+		// TODO Auto-generated method stub
+		return this.telasOrientador;
+	}
+	
+	@Override
 	public Pane render() {
 		try { 
             control = new CadAreaController(this.user);
         } catch (SistemaException e) { 
             alert(AlertType.ERROR, "Ao ao inicializar o sistema");
         }
+		
+		
+		 //Preenche Map de telas
+			telasOrientador.put("login", new LoginView());
+			telasOrientador.put("cadastroArea", new CadAreaView());
+			telasOrientador.put("menu", new MenuOrientador());
 		
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneform = new GridPane();
@@ -127,6 +143,8 @@ public class CadAreaView implements TelaLogadoOrientador {
                  (StringConverter) new IntegerStringConverter());
     	cbArea.valueProperty().bindBidirectional(control.nomeProperty());
     }
+
+
     
 }
 
