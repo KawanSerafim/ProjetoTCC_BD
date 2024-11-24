@@ -36,11 +36,11 @@ public class Conexao {
 		return instancia;
 	}
 	
-	public Connection getConection() throws SistemaException {
+	public Connection getConnection() throws SistemaException {
 		try {
 			if (this.connection == null ||
 					this.connection.isClosed() ||
-					!this.getConection().isValid(5000)) {
+					!this.getConnection().isValid(5000)) {
 				//Configuração da String da conexão com SQLServer
 						this.connection = DriverManager.getConnection(DB_URL);
 			}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import controller.CadAlunoController;
+import controller.persistence.exceptions.SistemaException;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -21,34 +22,60 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
+import model.entidades.Aluno;
 import view.interfaces.Tela;
+import view.interfaces.TelaLogadoAluno;
 
-public class CadAlunoView implements Tela {
+public class CadAlunoView implements TelaLogadoAluno{
+	
 	//Campos de Texto
 	private TextField txtNome = new TextField();
 	private TextField txtRa = new TextField();
 	private TextField txtEmail = new TextField();
 	private TextField txtSenha = new TextField();
 	
+		
 	//Lista de cursos
 	private List<String> cursos = new ArrayList<>();
 	
 	//ComboBox
 	ComboBox<String> cbCurso = new ComboBox<>();
-	SimpleStringProperty curso;
+
 	ComboBox<String> cbTurno = new ComboBox<>();
-	SimpleStringProperty turno;
+
 	ComboBox<Integer> cbSemestre = new ComboBox<>();
-	SimpleIntegerProperty semestre;
+	
+	private Aluno user;
+
+	
+	@Override
+	public void setUser(Aluno user) {
+		this.user = user;
+		
+	}
+
+	@Override
+	public Aluno getUser() {
+		return this.user;
+	}
+	
+	
 	
 	//control
-	private CadAlunoController control = new CadAlunoController();
+	private CadAlunoController control;
 	
 	@Override
 	public Pane render() {
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
+		
+		//Instancia o control
+		try {
+			control = new CadAlunoController();
+		} catch (SistemaException e) {
+			alert(AlertType.ERROR, "Erro ao inicializar");
+		}
 		
 		//Restrições de coluna e linha
         ColumnConstraints colLabels = new ColumnConstraints();
@@ -107,12 +134,12 @@ public class CadAlunoView implements Tela {
 		vincularComboBox();
 		
 		btnCad.setOnAction(e -> {
-			control.cadastrar();
-			Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Cadastro de Aluno");
-            alert.setHeaderText("Informativo");
-            alert.setContentText("Aluno foi cadastrado com sucesso");
-            alert.show();
+			try {
+				control.cadastrar();
+			} catch (SistemaException e1) {
+				alert(AlertType.ERROR, "Erro ao gravar dados");
+			}
+			alert(AlertType.INFORMATION,"Aluno foi cadastrado com sucesso");
 		});
 		
 		paneForm.add(btnCad, 1, 7);
@@ -123,6 +150,13 @@ public class CadAlunoView implements Tela {
 		return panePrincipal;
 	}
 	
+	private void alert(AlertType tipo, String msg) {
+		Alert alertWindow = new Alert(tipo);
+		alertWindow.setHeaderText("Alerta");
+		alertWindow.setContentText(msg);
+		alertWindow.showAndWait();
+	}
+
 	private void preencheLista() {
 			this.cursos.add("Análise e desenvolvimento de sistemas");
 			this.cursos.add("Desenvolvimento de Sistemas Multiplataforma");
@@ -142,11 +176,12 @@ public class CadAlunoView implements Tela {
     		    control.getCurso());
     	 cbTurno.valueProperty().bindBidirectional(
     			 control.getTurno());
-    	
     	 cbSemestre.valueProperty().bindBidirectional(
     			 control.getSemestre().asObject());
     	
 
     }
+
+
 
 }

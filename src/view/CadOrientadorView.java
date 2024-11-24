@@ -1,6 +1,7 @@
 package view;
 
 import controller.CadOrientadorController;
+import controller.persistence.exceptions.SistemaException;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -22,13 +23,20 @@ public class CadOrientadorView implements Tela {
 	private TextField txtSenha = new TextField();
 	
 	//control
-	private CadOrientadorController control = new CadOrientadorController();
+	private CadOrientadorController control;
 	
 	@Override
 	public Pane render() {
 		//Paineis
 		BorderPane panePrincipal = new BorderPane();
 		GridPane paneForm = new GridPane();
+		
+		//Instancia o contol
+		try {
+			control = new CadOrientadorController();
+		} catch(SistemaException err) {
+			alert(AlertType.ERROR, "Ao ao inicializar o sistema");
+		}
 		
 		//Restrições de coluna e linha
         ColumnConstraints colLabels = new ColumnConstraints();
@@ -67,12 +75,11 @@ public class CadOrientadorView implements Tela {
 		btnCad.setStyle("-fx-padding: 14px;");
 		
 		btnCad.setOnAction(e -> {
-			control.cadastrar();
-			Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Cadastro de Aluno");
-            alert.setHeaderText("Informativo");
-            alert.setContentText("Orientador foi cadastrado com sucesso");
-            alert.show();
+			try {
+				control.cadastrar();
+			} catch (SistemaException err) {
+				alert(AlertType.ERROR, "Erro ao gravar");
+			}
 		});
 		
 		paneForm.add(btnCad, 1, 4);
@@ -85,7 +92,14 @@ public class CadOrientadorView implements Tela {
 		
 	}
 	
-    public void vincularPropriedes() { 
+    private void alert(AlertType tipo, String msg) {
+		Alert alertWindow = new Alert(tipo);
+		alertWindow.setHeaderText("Alerta");
+		alertWindow.setContentText(msg);
+		alertWindow.showAndWait();
+	}
+
+	public void vincularPropriedes() { 
         Bindings.bindBidirectional(txtNome.textProperty(), control.getNome());
         Bindings.bindBidirectional(txtMatricula.textProperty(), control.getMatricula());
         Bindings.bindBidirectional(txtEmail.textProperty(), control.getEmail());

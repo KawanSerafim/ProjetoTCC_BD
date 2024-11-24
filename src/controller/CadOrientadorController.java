@@ -1,9 +1,12 @@
 package controller;
 
+import controller.persistence.OrientadorDAOImpl;
+import controller.persistence.exceptions.SistemaException;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import model.dao.OrientadorDAO;
 import model.entidades.Orientador;
 
 public class CadOrientadorController {
@@ -17,8 +20,14 @@ public class CadOrientadorController {
 		//Orientador
 		private StringProperty matricula = new SimpleStringProperty();
 		
+		//BD
+		private OrientadorDAO orientadorDAO; 
 		
-		public void cadastrar() {
+		public CadOrientadorController() throws SistemaException {
+			orientadorDAO = new OrientadorDAOImpl();
+		}
+		
+		public void cadastrar() throws SistemaException {
 			Orientador o = new Orientador();
 			contadorId += 1;
 			o.setId(contadorId);
@@ -26,10 +35,12 @@ public class CadOrientadorController {
 			o.setEmail(this.email.get());
 			o.setSenha(this.senha.get());
 			o.setMatricula(this.matricula.get());
+			orientadorDAO.inserir(o);
 			System.out.println("Novo orientador cadastrado");	
 			mostraOrientador(o);
 		}
 
+		//Metodo para debug
 		private void mostraOrientador(Orientador o) {
 				System.out.println("id: " +  o.getId()
 											+ "\nnome: " + o.getNome()

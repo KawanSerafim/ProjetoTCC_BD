@@ -1,9 +1,14 @@
 package controller;
 
+import controller.persistence.AlunoDAOImpl;
+import controller.persistence.OrientadorDAOImpl;
+import controller.persistence.exceptions.SistemaException;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import model.dao.AlunoDAO;
+import model.dao.OrientadorDAO;
 import model.entidades.Aluno;
 
 public class CadAlunoController {
@@ -20,7 +25,16 @@ public class CadAlunoController {
 	private StringProperty turno = new SimpleStringProperty();
 	private IntegerProperty semestre = new SimpleIntegerProperty();
 	
-	public void cadastrar() {
+	//BD
+	private AlunoDAO alunoDAO; 
+	
+	public CadAlunoController() throws SistemaException {
+		alunoDAO = new AlunoDAOImpl();
+	}
+	
+	
+	public void cadastrar() throws SistemaException {
+		
 		Aluno a = new Aluno();
 		contadorId += 1;
 		a.setId(contadorId);
@@ -31,6 +45,7 @@ public class CadAlunoController {
 		a.setCurso(this.curso.get());
 		a.setTurno(this.turno.get());
 		a.setSemestre( this.semestre.get());
+		alunoDAO.inserir(a);
 		System.out.println("Novo aluno cadastrado");
 		
 	}
